@@ -6,10 +6,9 @@ import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArro
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import { booksSummery } from "../Book/BooksSummery";
 import { useNavigate } from "react-router-dom";
-import {roles} from "../Book/Roles.js"
-import { DragDropContext, Draggable ,Droppable } from "react-beautiful-dnd";
+import { roles } from "../Book/Roles.js";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import RoleDraggable from "../components/RoleDraggable.js"; // Your RoleDraggable component
-
 
 function CharaterSelecter() {
   const location = useLocation();
@@ -34,84 +33,123 @@ function CharaterSelecter() {
   }, [book]);
 
   const handleOptionChange = (characterName, value) => {
-    
     setCharacterValues({ ...characterValues, [characterName]: value });
   };
 
   const handleDragEnd = (result) => {
     // Check if the item was dropped outside of a droppable area
     if (!result.destination) {
-        return;
+      return;
     }
     const newCharacterValues = { ...characterValues };
-    console.log(newCharacterValues)
-    const role = roles.find(role => role.Role === result.draggableId); // find the actual role object
+    console.log(newCharacterValues);
+    const role = roles.find((role) => role.Role === result.draggableId); // find the actual role object
     newCharacterValues[result.destination.droppableId] = role; // store the role object instead of id
     setCharacterValues(newCharacterValues);
-    console.log(newCharacterValues)
-};
+    console.log(newCharacterValues);
+  };
 
   const navigate = useNavigate();
 
   const handleNextButtonClick = () => {
-    const selectedOptions = Object.keys(characterValues).map((characterName) => ({
-      Character: characterName,
-      VA: characterValues[characterName].RoleParameter,
-    }));
-    console.log("Print",selectedOptions);
+    const selectedOptions = Object.keys(characterValues).map(
+      (characterName) => ({
+        Character: characterName,
+        VA: characterValues[characterName].RoleParameter,
+      })
+    );
+    console.log("Print", selectedOptions);
     navigate("/story", { state: { selectedOptions } });
   };
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-    <div>
-      <div className="row">
-        <div className="rightbutton col-1">
-          <Link to="/">
-            <button className="btn btn-primary">
-              <i>
-                <KeyboardDoubleArrowLeftIcon />
-              </i>
-            </button>
-          </Link>
-        </div>
-        <div className="col-8">
-          <div className="sectionTitle display-3 m-5">Select Character's Role</div>
-          <Droppable droppableId="roles">
-        {(provided) => (
-          <div 
-            {...provided.droppableProps} 
-            ref={provided.innerRef}
-            className="DraggableContainer" // Apply the CSS class
-          >
-            {roles.map((role, index) => (
-               <RoleDraggable key={role.Role} role={role} draggableId={role.Role} index={index} />
-            ))}
-            {provided.placeholder}
+      <div>
+        <div className="row">
+          <div className="rightbutton col-1">
+            <Link to="/">
+              <button className="btn btn-primary">
+                <i>
+                  <KeyboardDoubleArrowLeftIcon />
+                </i>
+              </button>
+            </Link>
           </div>
-        )}
-      </Droppable>
-      <div className="row">
-          {book &&
-            book.Characters.map((character, index) => {
-              const role = characterValues[character.charater_name];
-              return (
-                <div key={index} className="col-md-4">
-                  <CharacterCard character={character} role={role} />
+          <div className="col-8">
+            <div className="sectionTitle display-3 m-5">
+              Select Character's Role
+            </div>
+            <Droppable droppableId="roles">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="DraggableContainer" // Apply the CSS class
+                >
+                  {roles.map((role, index) => (
+                    <RoleDraggable
+                      key={role.Role}
+                      role={role}
+                      draggableId={role.Role}
+                      index={index}
+                    />
+                  ))}
+                  {provided.placeholder}
                 </div>
-              );
-            })}
-      </div>
+              )}
+            </Droppable>
+            <div className="row">
+              <div className="col">
+                {book &&
+                  book.Characters.map((character, index) => {
+                    const role = characterValues[character.charater_name];
+                    return (
+                      <div key={index}>
+                        <div className="row">
+                          <div className="col">
+                            <div
+                              className="card shadow p-2 mb-2 bg-white rounded"
+                              style={{ width: "200px", height: "150px" }}
+                            >
+                              <img
+                                src={character.img}
+                                className="card-img-top"
+                                alt="Card Image"
+                              />
+                            </div>
+                          </div>
+                          <div className="col">
+                            <h5 class="card-title mt-5">
+                              {character.charater_name}
+                            </h5>
+                          </div>
+                          <div className="col">
+                            <div key={index} className="col-md-4">
+                              <CharacterCard
+                                character={character}
+                                role={role}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+              <div className="leftbutton col-1">
+                <button
+                  className="btn btn-primary"
+                  onClick={handleNextButtonClick}
+                >
+                  <i>
+                    <KeyboardDoubleArrowRightIcon />
+                  </i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="leftbutton col-1">
-          <button className="btn btn-primary" onClick={handleNextButtonClick}>
-            <i>
-              <KeyboardDoubleArrowRightIcon />
-            </i>
-          </button>
-        </div>
       </div>
-    </div>
     </DragDropContext>
   );
 }
